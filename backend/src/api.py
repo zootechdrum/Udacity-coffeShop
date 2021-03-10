@@ -4,7 +4,7 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+from .database.models import db_drop_and_create_all, setup_db, Drink, db
 from .auth.auth import AuthError, requires_auth, check_permissions
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -30,12 +30,14 @@ CORS(app)
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
     drinks = Drink.query.all()
-    print(drinks)
     return jsonify({
         'success': True,
-        'drinks':drinks
-
-        })
+        'drinks':{
+            'id':1,
+            'title':'Mocha',
+            'recipe':[{'color': 'red', 'parts': 3}]
+        }
+    })
 
 '''
 @TODO implement endpoint
@@ -57,18 +59,30 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    body = request.get_json()
+    title = body.get('title')
+    recipe = body.get('recipe')
+    
+    # try:
+    new_drink = Drink(title=title,recipe=json.dumps(recipe))
+    print(new_drink.short())
+    print(new_drink.long())
+        # new_drink.insert()
+        # db.session.close()
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
+
+# @TODO implement endpoint
+#     PATCH /drinks/<id>
+#         where <id> is the existing model id
+#         it should respond with a 404 error if <id> is not found
+#         it should update the corresponding row for <id>
+#         it should require the 'patch:drinks' permission
+#         it should contain the drink.long() data representation
+#     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
+#         or appropriate status code indicating reason for failure
+
 
 
 '''
