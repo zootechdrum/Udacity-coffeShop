@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -33,9 +33,12 @@ def get_drinks():
     return jsonify({
         'success': True,
         'drinks':{
-            'id':1,
-            'title':'Mocha',
-            'recipe':[{'color': 'red', 'parts': 3}]
+            "id":1,
+            "title": "Water3",
+            "recipe": [{
+            "color": "blue",
+            "parts": 1
+            }]
         }
     })
 
@@ -47,7 +50,21 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks-detail', methods=['GET'])
+def get_drink_detail():
+    drinks = Drink.query.all()
+    print(drinks)
+    return jsonify({
+        'success': True,
+        'drinks':{
+            "title": "Red",
+            "recipe": [{
+            "name": "Water",
+            "color": "blue",
+            "parts": 1
+            }]
+        }
+    })
 
 '''
 @TODO implement endpoint
@@ -64,13 +81,17 @@ def add_drink():
     body = request.get_json()
     title = body.get('title')
     recipe = body.get('recipe')
+    print(title)
     
     # try:
     new_drink = Drink(title=title,recipe=json.dumps(recipe))
-    print(new_drink.short())
-    print(new_drink.long())
-        # new_drink.insert()
-        # db.session.close()
+    new_drink.insert()
+
+    return jsonify({
+        'success': True,
+        'drinks': body,
+    }), 200
+
 
 
 # @TODO implement endpoint
