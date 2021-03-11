@@ -32,15 +32,8 @@ def get_drinks():
     drinks = Drink.query.all()
     return jsonify({
         'success': True,
-        'drinks':{
-            "id":1,
-            "title": "Water3",
-            "recipe": [{
-            "color": "blue",
-            "parts": 1
-            }]
-        }
-    })
+        'drinks':[drink.short() for drink in drinks]
+    }), 200
 
 '''
 @TODO implement endpoint
@@ -50,20 +43,14 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@requires_auth('get:drinks-detail')
 @app.route('/drinks-detail', methods=['GET'])
 def get_drink_detail():
     drinks = Drink.query.all()
-    print(drinks)
+
     return jsonify({
         'success': True,
-        'drinks':{
-            "title": "Red",
-            "recipe": [{
-            "name": "Water",
-            "color": "blue",
-            "parts": 1
-            }]
-        }
+        'drinks':[drink.long() for drink in drinks]
     })
 
 '''
@@ -75,13 +62,12 @@ def get_drink_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-
+@requires_auth('post:drinks')
 @app.route('/drinks', methods=['POST'])
 def add_drink():
     body = request.get_json()
     title = body.get('title')
     recipe = body.get('recipe')
-    print(title)
     
     # try:
     new_drink = Drink(title=title,recipe=json.dumps(recipe))
@@ -116,7 +102,26 @@ def add_drink():
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+        drink = {}
+        error = False
+        try:
+            drink = Drink.query.filter(
+                Drink.id == drink_id).first()
 
+            if drink is None:
+                abort(404)
+            drink.delete()
+        except:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+        if error:
+            abort(422)
+        else:
+            return jsonify({'success': True})
 
 ## Error Handling
 '''
