@@ -79,17 +79,33 @@ def add_drink():
     }), 200
 
 
+'''
+@TODO implement endpoint
+    PATCH /drinks/<id>
+        where <id> is the existing model id
+        it should respond with a 404 error if <id> is not found
+        it should update the corresponding row for <id>
+        it should require the 'patch:drinks' permission
+        it should contain the drink.long() data representation
+    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
+        or appropriate status code indicating reason for failure
+'''
+# @requires_auth('patch:drinks')
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+def update_drink(id):
+    body = request.get_json()
+    title = body.get('title')
+    recipe = body.get('recipe')
 
-# @TODO implement endpoint
-#     PATCH /drinks/<id>
-#         where <id> is the existing model id
-#         it should respond with a 404 error if <id> is not found
-#         it should update the corresponding row for <id>
-#         it should require the 'patch:drinks' permission
-#         it should contain the drink.long() data representation
-#     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-#         or appropriate status code indicating reason for failure
+    update_drink = Drink.query.filter(Drink.id == id).one_or_none()
+    update_drink.title = title
+    update_drink.recipe = json.dumps(recipe)
+    update_drink.update()
 
+    return jsonify({
+        'success': True,
+        'drinks': [update_drink.long()],
+    }), 200
 
 
 '''
