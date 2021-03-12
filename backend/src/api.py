@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -43,9 +43,10 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('get:drinks-detail')
+
 @app.route('/drinks-detail', methods=['GET'])
-def get_drink_detail():
+@requires_auth('get:drinks-detail')
+def get_drink_detail(self):
     drinks = Drink.query.all()
 
     return jsonify({
@@ -62,21 +63,24 @@ def get_drink_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('post:drinks')
+
 @app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
 def add_drink():
     body = request.get_json()
     title = body.get('title')
     recipe = body.get('recipe')
     
-    # try:
-    new_drink = Drink(title=title,recipe=json.dumps(recipe))
-    new_drink.insert()
+    try:
+        new_drink = Drink(title=title,recipe=json.dumps(recipe))
+        new_drink.insert()
 
-    return jsonify({
-        'success': True,
-        'drinks': body,
-    }), 200
+        return jsonify({
+            'success': True,
+            'drinks': body,
+        }), 200
+    except:
+        abort(401)
 
 
 '''
@@ -90,8 +94,9 @@ def add_drink():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-# @requires_auth('patch:drinks')
+
 @app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
 def update_drink(id):
     body = request.get_json()
     title = body.get('title')
@@ -118,7 +123,9 @@ def update_drink(id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
 @app.route('/drinks/<drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
 def delete_drink(drink_id):
         drink = {}
         error = False
@@ -161,6 +168,13 @@ def unprocessable(error):
                     }), 404
 
 '''
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 404,
+                    "message":  "resource not found"
+                    }), 404
 
 '''
 @TODO implement error handler for 404
@@ -172,3 +186,10 @@ def unprocessable(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(401)
+def unauthorized_user(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 401,
+                    "message":  "Authorization Error"
+                    }), 401

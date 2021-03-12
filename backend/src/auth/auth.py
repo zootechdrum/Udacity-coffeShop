@@ -61,11 +61,13 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
+
     if 'permissions' not in payload:
-        abort(400)
+        abort(401)
         
-    if 'permission' not in payload['permissions']:
-        abort(403)
+    if permission not in payload['permissions']:
+        print("Hello")
+        abort(401)
     
     return True
 
@@ -98,8 +100,9 @@ def verify_decode_jwt(token):
             'code': 'invalid_header',
             'description': 'Authorization malformed.'
         }, 401)
-
+    print(jwks['keys'])
     for key in jwks['keys']:
+        print(key['kty'])
         if key['kid'] == unverified_header['kid']:
             rsa_key = {
                 'kty': key['kty'],
@@ -108,6 +111,7 @@ def verify_decode_jwt(token):
                 'n': key['n'],
                 'e': key['e']
             }
+    print(rsa_key)
     if rsa_key:
         try:
             # USE THE KEY TO VALIDATE THE JWT
