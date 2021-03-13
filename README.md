@@ -8,12 +8,12 @@ This application displayes makes certain endpoints available to certain users.
 For example, baristas will be able to
     -- See the recipe information.
  Managers will be able to:
-    -- Allow the shop managers to create new drinks and edit existing drinks.
+    --  create new drinks and edit existing drinks.
 
 
 #### Virtual Enviornment
 
-We recommend working within a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organaized. Instructions for setting up a virual enviornment for your platform can be found in the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+It is recommend working within a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organaized. Instructions for setting up a virual enviornment for your platform can be found in the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
 
 #### PIP Dependencies
 
