@@ -23,6 +23,7 @@ Once you have your virtual environment setup and running, install dependencies b
 pip install -r requirements.txt
 ```
 
+All backend code follows PEP8 style guidelines['https://www.python.org/dev/peps/pep-0008/']
 
 ### Backend
 
