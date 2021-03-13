@@ -211,3 +211,12 @@ def not_found(error):
 @TODO implement error handler for 404
     error handler should conform to general task above
 '''
+
+
+@app.errorhandler(401)
+def AuthError(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "You are not Authorized"
+    }), 401
